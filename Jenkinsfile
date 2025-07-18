@@ -1,9 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven' // nom que tu as défini dans Jenkins > Global Tool Configuration
-        jdk 'JDK17'   // nom que tu as défini pour Java 17
+    environment {
+        // Chemins pour WSL/Ubuntu (ajustez selon votre installation)
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
