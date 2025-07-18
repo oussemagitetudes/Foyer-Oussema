@@ -1,15 +1,13 @@
 pipeline {
     agent any
-    
-    tools {
-        maven 'Maven'      // Nom défini dans Jenkins > Tools > Maven
-        jdk 'JDK17'        // Nom défini dans Jenkins > Tools > JDK
-    }
-
 
     environment {
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
+        PATH = "${JAVA_HOME}/bin:${PATH}"
+    }
+
+    tools {
+        maven 'Maven'  // Conservez cela si Maven est bien défini dans Jenkins > Tools > Maven
     }
 
     stages {
