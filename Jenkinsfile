@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        // Chemins pour WSL/Ubuntu (ajustez selon votre installation)
         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
         PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
     }
@@ -16,13 +15,13 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                sh './mvnw clean test'
+                sh 'mvn clean test'
             }
         }
 
         stage('Code Coverage') {
             steps {
-                sh './mvnw jacoco:report'
+                sh 'mvn jacoco:report'
             }
         }
 
