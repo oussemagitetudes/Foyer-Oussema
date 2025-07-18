@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    ports:
+      - "${JENKINS_PORT:-8080}:8080"
+      - "${JENKINS_SLAVE_PORT:-50000}:50000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_home:/var/jenkins_home
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_ADMIN_ID=${JENKINS_ADMIN_ID:-admin}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD:-admin}
+      - TRY_UPGRADE_IF_NO_MARKER=true
+    networks:
+      - devops
+
+  sonarqube:
+    image: sonarqube:9.9-community
+    container_name: sonarqube
+    ports:
+      - "${SONARQUBE_PORT:-9000}:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - devops
+
+  sonarqube-db:
+    image: postgres:13
+    container_name: sonarqube-db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    ports:
+      - "5432:5432"
+    networks:
+      - devops
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    ports:
+      - "${NEXUS_PORT:-8081}:8081"
+      - "8082:8082"
+    environment:
+      - NEXUS_PROMETHEUS_ENABLED=true
+      - INSTALL4J_ADD_VM_PARAMS=-Xms512m -Xmx1024m -XX:MaxDirectMemorySize=2G
+    volumes:
+      - nexus-data:/nexus-data
+    networks:
+      - devops
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - devops
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASS:-admin}
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - devops
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    container_name: keycloak
+    command: start-dev
+    ports:
+      - "${KEYCLOAK_PORT:-8090}:8080"
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USER:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin123}
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HTTP_ENABLED=true
+      - KC_HEALTH_ENABLED=true
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+    networks:
+      - devops
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - devops
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: foyerdb
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - devops
+
+  backend-app:
+    image: ${NEXUS_DOCKER_URL:-nexus:8081}/foyer2425:${APP_VERSION:-latest}
+    container_name: backend-app
+    ports:
+      - "8088:8080"
+    depends_on:
+      - mysql
+    networks:
+      - devops
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/foyerdb?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-root}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-root}
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - MANAGEMENT_ENDPOINT_METRICS_ENABLED=true
+      - MANAGEMENT_ENDPOINT_PROMETHEUS_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+
+volumes:
+  jenkins_home:
+  grafana-storage:
+  nexus-data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_db_data:
+  mysql-data:
+  keycloak-data:
+
+networks:
+  devops: 
