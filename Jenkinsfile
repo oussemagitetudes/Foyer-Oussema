@@ -20,44 +20,81 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                sh 'mvn clean package'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean package'
+                    } else {
+                        bat 'mvn clean package'
+                    }
+                }
             }
         }
 
         stage('Code Coverage') {
             steps {
-                sh 'mvn jacoco:report'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn jacoco:report'
+                    } else {
+                        bat 'mvn jacoco:report'
+                    }
+                }
             }
         }
 
         stage('Publish to Nexus') {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                    sh 'mvn deploy -DskipTests -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASS'
+                    script {
+                        if (isUnix()) {
+                            sh 'mvn deploy -DskipTests -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASS'
+                        } else {
+                            bat 'mvn deploy -DskipTests -Dnexus.username=%NEXUS_USER% -Dnexus.password=%NEXUS_PASS%'
+                        }
+                    }
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
+                script {
+                    if (isUnix()) {
+                        sh "docker build -t $DOCKER_IMAGE ."
+                    } else {
+                        bat "docker build -t $DOCKER_IMAGE ."
+                    }
+                }
             }
         }
 
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                    sh "docker push $DOCKER_IMAGE"
+                    script {
+                        if (isUnix()) {
+                            sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                            sh "docker push $DOCKER_IMAGE"
+                        } else {
+                            bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
+                            bat "docker push $DOCKER_IMAGE"
+                        }
+                    }
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                // Déploiement automatique via docker-compose (adapter selon ton infra)
-                sh 'docker-compose down || true'
-                sh "docker-compose up -d"
+                script {
+                    if (isUnix()) {
+                        sh 'docker-compose down || true'
+                        sh "docker-compose up -d"
+                    } else {
+                        bat 'docker-compose down || exit /b 0'
+                        bat "docker-compose up -d"
+                    }
+                }
             }
         }
     }
@@ -65,6 +102,12 @@ pipeline {
     post {
         always {
             echo 'Pipeline terminé.'
+        }
+        success {
+            echo 'Pipeline exécuté avec succès!'
+        }
+        failure {
+            echo 'Pipeline a échoué!'
         }
     }
 }
