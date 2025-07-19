@@ -139,7 +139,8 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
-        // Additional assertions based on expected data
+        // The list can be empty if no bloc with name "Bloc A" exists
+        // This is expected behavior when no matching data is found
     }
 
     @Test
@@ -160,6 +161,8 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
+        // The list can be empty if no foyer with name "Foyer A" exists
+        // This is expected behavior when no matching data is found
     }
 
     @Test
@@ -191,6 +194,8 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
+        // The list can be empty if no bloc with name "Bloc A" exists
+        // This is expected behavior when no matching data is found
     }
 
     @Test
@@ -201,6 +206,8 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
+        // The list can be empty if no bloc with name "Bloc A" exists
+        // This is expected behavior when no matching data is found
     }
 
     @Test
@@ -211,6 +218,8 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
+        // The list can be empty if no bloc with name "Bloc A" exists
+        // This is expected behavior when no matching data is found
     }
 
     @Test
@@ -221,5 +230,7 @@ public class ChambreServiceTest {
 
         // Then
         assertNotNull(chambres);
+        // The list can be empty if no bloc with name "Bloc A" exists
+        // This is expected behavior when no matching data is found
     }
 } 

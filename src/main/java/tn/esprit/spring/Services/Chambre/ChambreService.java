@@ -187,6 +187,9 @@ public class ChambreService implements IChambreService {
     @Override
     public List<Chambre> getChambresParNomBlocJava(String nomBloc) {
         Bloc b = blocRepository.findByNomBloc(nomBloc);
+        if (b == null) {
+            return new ArrayList<>();
+        }
         return b.getChambres();
     }
 
