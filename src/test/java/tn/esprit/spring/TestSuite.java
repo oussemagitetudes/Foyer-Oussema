@@ -1,9 +1,5 @@
 package tn.esprit.spring;
 
-import org.junit.platform.suite.api.SelectClasses;
-import org.junit.platform.suite.api.Suite;
-import org.junit.platform.suite.api.SuiteDisplayName;
-
 /**
  * Test Suite for Foyer Management System
  * 
@@ -20,22 +16,16 @@ import org.junit.platform.suite.api.SuiteDisplayName;
  * - Business logic methods
  * - Edge cases and error handling
  * - Mock-based testing for isolated unit testing
+ * 
+ * Note: This is a placeholder class. To run all tests, use:
+ * mvn test
+ * 
+ * To run specific test classes:
+ * mvn test -Dtest=BlocServiceTest
+ * mvn test -Dtest=BlocRestControllerTest
  */
-@Suite
-@SuiteDisplayName("Foyer Management System Test Suite")
-@SelectClasses({
-    // Integration Tests (with Spring context)
-    BlocServiceTest.class,
-    ChambreServiceTest.class,
-    EtudiantServiceTest.class,
-    FoyerServiceTest.class,
-    ReservationServiceTest.class,
-    UniversiteServiceTest.class,
-    
-    // Mock Tests (isolated unit testing)
-    BlocServiceMockTest.class
-})
 public class TestSuite {
-    // This class serves as a test suite container
-    // All tests are automatically discovered and executed
+    // This class serves as a documentation placeholder
+    // All tests are automatically discovered and executed by Maven
+    // when running: mvn test
 } 
