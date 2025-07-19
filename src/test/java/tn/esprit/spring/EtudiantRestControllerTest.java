@@ -249,7 +249,7 @@ public class EtudiantRestControllerTest {
         Etudiant etudiant = Etudiant.builder()
                 .nomEt(null)
                 .prenomEt(null)
-                .cin(null)
+                .cin(0L)
                 .ecole(null)
                 .dateNaissance(null)
                 .build();

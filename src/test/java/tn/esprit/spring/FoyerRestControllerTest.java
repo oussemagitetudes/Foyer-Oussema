@@ -334,7 +334,7 @@ public class FoyerRestControllerTest {
         // Given
         Foyer foyer = Foyer.builder()
                 .nomFoyer(null)
-                .capaciteFoyer(null)
+                .capaciteFoyer(0L)
                 .build();
 
         // When

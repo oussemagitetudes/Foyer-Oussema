@@ -192,8 +192,8 @@ public class BlocServiceMockTest {
     @Order(9)
     void testAffecterBlocAFoyer() {
         // Given
-        when(blocRepository.findByNomBloc("TestBloc")).thenReturn(Optional.of(testBloc));
-        when(foyerRepository.findByNomFoyer("TestFoyer")).thenReturn(Optional.of(testFoyer));
+        when(blocRepository.findByNomBloc("TestBloc")).thenReturn(testBloc);
+        when(foyerRepository.findByNomFoyer("TestFoyer")).thenReturn(testFoyer);
         when(blocRepository.save(any(Bloc.class))).thenReturn(testBloc);
 
         // When
@@ -210,7 +210,7 @@ public class BlocServiceMockTest {
     @Order(10)
     void testAffecterBlocAFoyerBlocNotFound() {
         // Given
-        when(blocRepository.findByNomBloc("NonExistentBloc")).thenReturn(Optional.empty());
+        when(blocRepository.findByNomBloc("NonExistentBloc")).thenReturn(null);
 
         // When & Then
         assertThrows(RuntimeException.class, () -> 
@@ -224,8 +224,8 @@ public class BlocServiceMockTest {
     @Order(11)
     void testAffecterBlocAFoyerFoyerNotFound() {
         // Given
-        when(blocRepository.findByNomBloc("TestBloc")).thenReturn(Optional.of(testBloc));
-        when(foyerRepository.findByNomFoyer("NonExistentFoyer")).thenReturn(Optional.empty());
+        when(blocRepository.findByNomBloc("TestBloc")).thenReturn(testBloc);
+        when(foyerRepository.findByNomFoyer("NonExistentFoyer")).thenReturn(null);
 
         // When & Then
         assertThrows(RuntimeException.class, () -> 
@@ -264,7 +264,7 @@ public class BlocServiceMockTest {
                 .capaciteBloc(90L)
                 .build();
 
-        when(foyerRepository.findByNomFoyer("TestFoyer")).thenReturn(Optional.of(testFoyer));
+        when(foyerRepository.findByNomFoyer("TestFoyer")).thenReturn(testFoyer);
         when(blocRepository.save(any(Bloc.class))).thenReturn(testBloc);
 
         // When

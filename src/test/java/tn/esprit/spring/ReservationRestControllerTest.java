@@ -313,7 +313,7 @@ public class ReservationRestControllerTest {
         Reservation reservation = Reservation.builder()
                 .idReservation(null)
                 .anneeUniversitaire(null)
-                .estValide(null)
+                .estValide(false)
                 .build();
 
         // When
